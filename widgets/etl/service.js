@@ -110,18 +110,24 @@ Goblin.registerQuest (goblinName, 'load-csv', function (
   mapping,
   rowGoblin
 ) {
-  Papa.parse (filePath, {
-    header: true,
-    step: row => {
-      const rowData = row.data[0];
-      const params = {};
-      for (const map in mapping) {
-        const name = mapping[map];
-        params[name] = rowData[map];
-      }
-      quest.createNew (rowGoblin, Object.assign ({}, params));
-    },
-  });
+  try {
+    const stream = require ('fs').createReadStream;
+    let file = stream (filePath);
+    Papa.parse (file, {
+      header: true,
+      step: row => {
+        const rowData = row.data[0];
+        const params = {};
+        for (const map in mapping) {
+          const name = mapping[map];
+          params[name] = rowData[map];
+        }
+        quest.createNew (rowGoblin, Object.assign ({}, params));
+      },
+    });
+  } catch (err) {
+    throw new Error (err);
+  }
 });
 
 Goblin.registerQuest (goblinName, 'delete', function (quest) {});
