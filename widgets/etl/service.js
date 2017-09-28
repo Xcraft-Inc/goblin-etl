@@ -8,6 +8,10 @@ const Goblin = require ('xcraft-core-goblin');
 // Define initial logic values
 const logicState = {
   preview: {header: {}, rows: {}},
+  mapping: {
+    header: {},
+    rows: {},
+  },
 };
 
 // Define logic handlers according rc.json
@@ -16,13 +20,18 @@ const logicHandlers = {
     return state.set ('id', action.get ('id'));
   },
   'add-preview-column': (state, action) => {
-    return state.set ('preview.header', action.get ('columns'));
+    return state
+      .set ('preview.header', action.get ('columns'))
+      .set ('mapping.header', action.get ('columns'));
   },
   'add-preview-row': (state, action) => {
     return state.set (
       `preview.rows.${action.get ('rowId')}`,
       action.get ('row')
     );
+  },
+  'map-column-to-param': (state, action) => {
+    return state.merge (`mapping.rows.mapping`, action.get ('row'));
   },
 };
 
@@ -71,6 +80,19 @@ Goblin.registerQuest (goblinName, 'add-preview-column', function (
   quest.do ({columns});
 });
 
+Goblin.registerQuest (goblinName, 'map-column-to-param', function (
+  quest,
+  fromColumn,
+  toParam
+) {
+  const row = {
+    id: 'mapping',
+    [fromColumn]: toParam,
+  };
+
+  quest.do ({row});
+});
+
 Goblin.registerQuest (goblinName, 'add-preview-row', function (quest, data) {
   const rowId = quest.uuidV4 ();
   const row = Object.assign (
@@ -82,16 +104,22 @@ Goblin.registerQuest (goblinName, 'add-preview-row', function (quest, data) {
   quest.do ({rowId, row});
 });
 
-Goblin.registerQuest (goblinName, 'load-csv', function* (
+Goblin.registerQuest (goblinName, 'load-csv', function (
   quest,
-  name,
   filePath,
+  mapping,
   rowGoblin
 ) {
-  yield Papa.parse (filePath, {
+  Papa.parse (filePath, {
     header: true,
     step: row => {
-      quest.createNew (rowGoblin, Object.assign ({}, row.data));
+      const rowData = row.data[0];
+      const params = {};
+      for (const map in mapping) {
+        const name = mapping[map];
+        params[name] = rowData[map];
+      }
+      quest.createNew (rowGoblin, Object.assign ({}, params));
     },
   });
 });
