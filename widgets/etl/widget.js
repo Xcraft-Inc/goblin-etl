@@ -23,6 +23,8 @@ class Etl extends Form {
 
   addMap () {
     this.do ('map-column-to-param', {
+      table: this.getFormValue ('.table'),
+      type: this.getFormValue ('.type'),
       fromColumn: this.getFormValue ('.fromColumn'),
       toParam: this.getFormValue ('.toParam'),
     });
@@ -35,12 +37,9 @@ class Etl extends Form {
   }
 
   run () {
-    const mapping = this.getFormValue ('.mapping.rows.mapping').toJS ();
-    delete mapping.id;
-
+    const mapping = this.getFormValue ('.mapping.rows').toJS ();
     this.do ('load-csv', {
       filePath: this.getFormValue ('.file'),
-      rowGoblin: this.getFormValue ('.goblinName'),
       mapping,
     });
   }
@@ -67,7 +66,7 @@ class Etl extends Form {
       }
       const list = header.map (h => h.get ('id')).toArray ();
       return {list, model: '.fromColumn'};
-    }) ('.mapping.header');
+    }) ('.preview.header');
 
     return (
       <Container kind="view" grow="1" spacing="large">
@@ -77,8 +76,22 @@ class Etl extends Form {
           </Container>
           <Container kind="panes">
 
+            <Label glyph="cube" text="Extraire" grow="1" kind="title" />
+
             <Field kind="file" accept=".csv" model=".file" />
-            <Button text="Prévisualiser" onClick={this.runPreview} />
+            <Button text="démarrer" onClick={this.runPreview} />
+
+            <Label glyph="cube" text="Transformer" grow="1" kind="title" />
+
+            <MappingTable frame="true" />
+            <Field labelText="table" model=".table" />
+            <Field labelText="type" model=".type" />
+            <Columns kind="radios" labelText="colonne" direction="wrap" />
+            <Field labelText="paramètre" model=".toParam" />
+            <Button text="ajouter" glyph="plus" onClick={this.addMap} />
+
+            <Label glyph="cube" text="Charger" grow="1" kind="title" />
+            <Button text="démarrer" glyph="plus" onClick={this.run} />
 
             <ShowTable kind="pane">
 
@@ -88,23 +101,7 @@ class Etl extends Form {
                 grow="1"
                 kind="title"
               />
-              <PreviewTable height="500px" />
-
-              <Label glyph="cube" text="Mapping" grow="1" kind="title" />
-
-              <MappingTable />
-              <Columns kind="combo" labelText="colonne" />
-              <Field labelText="paramètre" model=".toParam" />
-              <Button text="ajouter" glyph="plus" onClick={this.addMap} />
-
-              <Label
-                glyph="cube"
-                text="Importateur goblin"
-                grow="1"
-                kind="title"
-              />
-              <Field labelText="goblin name" model=".goblinName" />
-              <Button text="démarrer" glyph="plus" onClick={this.run} />
+              <PreviewTable frame="true" />
             </ShowTable>
           </Container>
 

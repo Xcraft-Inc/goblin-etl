@@ -4,12 +4,35 @@ const path = require ('path');
 const goblinName = path.basename (module.parent.filename, '.js');
 const Papa = require ('papaparse');
 const Goblin = require ('xcraft-core-goblin');
+const entityMeta = require ('goblin-rethink').entityMeta;
 
 // Define initial logic values
 const logicState = {
   preview: {header: {}, rows: {}},
   mapping: {
-    header: {},
+    header: {
+      order: {
+        id: 'order',
+        name: 'order',
+        description: 'N°',
+        grow: '1',
+        textAlign: 'right',
+      },
+      table: {
+        id: 'table',
+        name: 'table',
+        description: 'table',
+        grow: '1',
+        textAlign: 'right',
+      },
+      type: {
+        id: 'type',
+        name: 'type',
+        description: 'Type',
+        grow: '1',
+        textAlign: 'right',
+      },
+    },
     rows: {},
   },
 };
@@ -20,9 +43,7 @@ const logicHandlers = {
     return state.set ('id', action.get ('id'));
   },
   'add-preview-column': (state, action) => {
-    return state
-      .set ('preview.header', action.get ('columns'))
-      .set ('mapping.header', action.get ('columns'));
+    return state.set ('preview.header', action.get ('columns'));
   },
   'add-preview-row': (state, action) => {
     return state.set (
@@ -31,7 +52,33 @@ const logicHandlers = {
     );
   },
   'map-column-to-param': (state, action) => {
-    return state.merge (`mapping.rows.mapping`, action.get ('row'));
+    const type = action.get ('type');
+    const table = action.get ('table');
+    const fromColumn = action.get ('fromColumn');
+    const column = type + 'Id';
+    return state
+      .merge (`mapping.rows.${table}`, action.get ('row'))
+      .set (`mapping.header.${fromColumn}`, {
+        id: fromColumn,
+        name: fromColumn,
+        description: fromColumn,
+        grow: '1',
+        textAlign: 'right',
+      })
+      .set (`preview.header.${column}`, {
+        id: column,
+        name: column,
+        description: column,
+        grow: '1',
+        textAlign: 'right',
+      })
+      .set (`mapping.header.${column}`, {
+        id: column,
+        name: column,
+        description: column,
+        grow: '1',
+        textAlign: 'right',
+      });
   },
 };
 
@@ -67,6 +114,7 @@ Goblin.registerQuest (goblinName, 'add-preview-column', function (
   header
 ) {
   const columns = {};
+
   for (const column in header) {
     columns[column] = {
       id: column,
@@ -82,15 +130,28 @@ Goblin.registerQuest (goblinName, 'add-preview-column', function (
 
 Goblin.registerQuest (goblinName, 'map-column-to-param', function (
   quest,
+  table,
   fromColumn,
-  toParam
+  toParam,
+  type
 ) {
+  const state = quest.goblin.getState ();
+  const currentSize = state.get ('mapping.rows')._state.size;
+  let order = state.get (`mapping.rows.${table}.order`);
+  if (order === undefined) {
+    order = currentSize;
+  }
   const row = {
-    id: 'mapping',
+    id: table,
+    order,
+    table,
+    type: type,
+    references: {},
+    [`${type}Id`]: '',
     [fromColumn]: toParam,
   };
 
-  quest.do ({row});
+  quest.do ({table, row});
 });
 
 Goblin.registerQuest (goblinName, 'add-preview-row', function (quest, data) {
@@ -104,27 +165,82 @@ Goblin.registerQuest (goblinName, 'add-preview-row', function (quest, data) {
   quest.do ({rowId, row});
 });
 
-Goblin.registerQuest (goblinName, 'load-csv', function (
+Goblin.registerQuest (goblinName, 'load-csv', function* (
   quest,
   filePath,
   mapping,
-  rowGoblin
+  next
 ) {
   try {
     const stream = require ('fs').createReadStream;
     let file = stream (filePath);
+    const ids = [];
+    const tables = {};
+    const orderMapping = [];
+
+    for (const table in mapping) {
+      orderMapping.splice (mapping[table].order, 0, mapping[table]);
+      tables[table] = [];
+    }
+    orderMapping.sort ();
+    let rowIndex = 0;
     Papa.parse (file, {
       header: true,
+      complete: next.parallel ().arg (0),
       step: row => {
         const rowData = row.data[0];
-        const params = {};
-        for (const map in mapping) {
-          const name = mapping[map];
-          params[name] = rowData[map];
+        for (const tableMap of orderMapping) {
+          const table = tableMap.table;
+          const type = tableMap.type;
+          const entity = {
+            id: `${type}@${quest.uuidV4 ()}`,
+          };
+
+          entityMeta.set (
+            entity,
+            table,
+            tableMap.references,
+            'imported',
+            'etl-job'
+          );
+
+          for (const map in tableMap) {
+            if (
+              map === 'table' ||
+              map === 'type' ||
+              map === 'references' ||
+              map === 'order' ||
+              map === 'id'
+            ) {
+              continue;
+            }
+            const name = tableMap[map];
+            if (rowData[map]) {
+              entity[name] = rowData[map];
+              continue;
+            }
+            if (ids[rowIndex]) {
+              if (ids[rowIndex][map]) {
+                entity[name] = ids[rowIndex][map];
+                continue;
+              }
+            }
+          }
+
+          ids[rowIndex] = {[`${type}Id`]: entity.id};
+          tables[table].push (entity);
         }
-        quest.createNew (rowGoblin, Object.assign ({}, params));
+        rowIndex++;
       },
     });
+
+    yield next.sync ();
+    const i = quest.openInventory ();
+    const r = i.use ('rethink@main');
+    for (const table in tables) {
+      r.set ({table, documents: tables[table]});
+    }
+    return;
   } catch (err) {
     throw new Error (err);
   }
