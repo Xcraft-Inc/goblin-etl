@@ -86,7 +86,7 @@ class Etl extends Form {
             <MappingTable frame="true" />
             <Field labelText="table" model=".table" />
             <Field labelText="type" model=".type" />
-            <Columns kind="radios" labelText="colonne" direction="wrap" />
+            <Columns kind="radio" labelText="colonne" direction="wrap" />
             <Field labelText="paramètre" model=".toParam" />
             <Button text="ajouter" glyph="plus" onClick={this.addMap} />
 
