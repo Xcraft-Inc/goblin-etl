@@ -198,6 +198,7 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
 
           entityMeta.set (
             entity,
+            type,
             table,
             tableMap.references,
             'imported',
