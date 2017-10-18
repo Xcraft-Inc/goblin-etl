@@ -82,7 +82,8 @@ const logicHandlers = {
   },
 };
 
-Goblin.registerQuest (goblinName, 'create', function (quest) {
+Goblin.registerQuest (goblinName, 'create', function (quest, desktopId) {
+  quest.goblin.setX ('desktopId', desktopId);
   quest.do ();
 });
 
@@ -237,7 +238,8 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
 
     yield next.sync ();
     const i = quest.openInventory ();
-    const r = i.use ('rethink@main');
+    const desktopId = quest.goblin.getX ('desktopId');
+    const r = i.use (`rethink@${desktopId}`);
     for (const table in tables) {
       r.set ({table, documents: tables[table]});
     }
