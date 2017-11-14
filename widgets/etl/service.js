@@ -197,13 +197,7 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
             id: `${type}@${quest.uuidV4 ()}`,
           };
 
-          entityMeta.set (
-            entity,
-            type,
-            tableMap.references,
-            'imported',
-            'etl-job'
-          );
+          entityMeta.set (entity, type, tableMap.references, 'imported');
 
           for (const map in tableMap) {
             if (
