@@ -232,7 +232,7 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
     yield next.sync ();
     const i = quest.openInventory ();
     const desktopId = quest.goblin.getX ('desktopId');
-    const r = i.use (`rethink@${desktopId}`);
+    const r = i.getAPI (`rethink@${desktopId}`);
     for (const table in tables) {
       r.set ({table, documents: tables[table]});
     }
