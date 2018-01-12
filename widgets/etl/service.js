@@ -197,7 +197,16 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
             id: `${type}@${quest.uuidV4 ()}`,
           };
 
-          entityMeta.set (entity, type, tableMap.references, 'imported');
+          entityMeta.set (
+            entity,
+            type,
+            tableMap.references,
+            null,
+            null,
+            entity.id,
+            [],
+            'draft'
+          );
 
           for (const map in tableMap) {
             if (
