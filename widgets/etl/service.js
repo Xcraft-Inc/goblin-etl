@@ -200,12 +200,12 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
           entityMeta.set (
             entity,
             type,
-            tableMap.references,
+            null,
             null,
             null,
             entity.id,
             [],
-            'draft'
+            'initial-import'
           );
 
           for (const map in tableMap) {
@@ -241,9 +241,30 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
     yield next.sync ();
     const i = quest.openInventory ();
     const desktopId = quest.goblin.getX ('desktopId');
+    const deskAPI = quest.getGoblinAPI ('desktop', desktopId);
     const r = i.getAPI (`rethink@${desktopId}`);
     for (const table in tables) {
-      r.set ({table, documents: tables[table]});
+      yield r.set ({table, documents: tables[table]});
+      deskAPI.addNotification ({
+        color: 'red',
+        message: `${tables[table].length} entités ${table} inséréés dans le stockage, démarrage de la mise à jour des entités...`,
+        glyph: 'check',
+      });
+      for (const entity of tables[table]) {
+        yield quest.cmd (`${table}.create`, {
+          id: entity.id,
+          desktopId,
+          entity: entity,
+        });
+        quest.cmd (`${table}.delete`, {
+          id: entity.id,
+        });
+      }
+      deskAPI.addNotification ({
+        color: 'green',
+        message: `mise à jour des ${tables[table].length} entités ${table} terminée`,
+        glyph: 'check',
+      });
     }
     return;
   } catch (err) {
