@@ -250,19 +250,51 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
         message: `${tables[table].length} entités ${table} inséréés dans le stockage, démarrage de la mise à jour des entités...`,
         glyph: 'check',
       });
+
+      let batchCount = 0;
+      const batchSize = 200;
       for (const entity of tables[table]) {
-        yield quest.cmd (`${table}.create`, {
-          id: entity.id,
-          desktopId,
-          entity: entity,
-        });
+        quest.cmd (
+          `${table}.create`,
+          {
+            id: entity.id,
+            desktopId,
+            entity: entity,
+          },
+          next.parallel ()
+        );
+
+        batchCount++;
+        if (batchCount % batchSize === 0) {
+          const ids = yield next.sync ();
+          for (const did of ids) {
+            quest.cmd (`${table}.delete`, {
+              id: did,
+            });
+          }
+
+          deskAPI.addNotification ({
+            notificationId: 'etl',
+            color: 'red',
+            message: `${Number (batchCount / tables[table].length * 100).toFixed (0)}% mis à jour`,
+            glyph: 'check',
+          });
+        }
+      }
+      const ids = yield next.sync ();
+      deskAPI.addNotification ({
+        color: 'red',
+        message: `${ids.length} entités ${table} mises à jour`,
+        glyph: 'check',
+      });
+      for (const did of ids) {
         quest.cmd (`${table}.delete`, {
-          id: entity.id,
+          id: did,
         });
       }
       deskAPI.addNotification ({
         color: 'green',
-        message: `mise à jour des ${tables[table].length} entités ${table} terminée`,
+        message: `${tables[table].length} entités ${table} chargées`,
         glyph: 'check',
       });
     }
