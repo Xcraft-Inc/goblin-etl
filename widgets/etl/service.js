@@ -248,7 +248,7 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
       deskAPI.addNotification ({
         color: 'red',
         message: `${tables[table].length} entités ${table} inséréés dans le stockage, démarrage de la mise à jour des entités...`,
-        glyph: 'check',
+        glyph: 'solid/check',
       });
 
       let batchCount = 0;
@@ -277,7 +277,7 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
             notificationId: 'etl',
             color: 'red',
             message: `${Number (batchCount / tables[table].length * 100).toFixed (0)}% mis à jour`,
-            glyph: 'check',
+            glyph: 'solid/check',
           });
         }
       }
@@ -285,7 +285,7 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
       deskAPI.addNotification ({
         color: 'red',
         message: `${ids.length} entités ${table} mises à jour`,
-        glyph: 'check',
+        glyph: 'solid/check',
       });
       for (const did of ids) {
         quest.cmd (`${table}.delete`, {
@@ -295,7 +295,7 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
       deskAPI.addNotification ({
         color: 'green',
         message: `${tables[table].length} entités ${table} chargées`,
-        glyph: 'check',
+        glyph: 'solid/check',
       });
     }
     return;

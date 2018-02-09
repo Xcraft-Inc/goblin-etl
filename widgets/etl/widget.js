@@ -76,27 +76,27 @@ class Etl extends Form {
           </Container>
           <Container kind="panes">
 
-            <Label glyph="cube" text="Extraire" grow="1" kind="title" />
+            <Label glyph="solid/cube" text="Extraire" grow="1" kind="title" />
 
             <Field kind="file" accept=".csv" model=".file" />
             <Button text="démarrer" onClick={this.runPreview} />
 
-            <Label glyph="cube" text="Transformer" grow="1" kind="title" />
+            <Label glyph="solid/cube" text="Transformer" grow="1" kind="title" />
 
             <MappingTable frame="true" />
             <Field labelText="table" model=".table" />
             <Field labelText="type" model=".type" />
             <Columns kind="radio" labelText="colonne" direction="wrap" />
             <Field labelText="paramètre" model=".toParam" />
-            <Button text="ajouter" glyph="plus" onClick={this.addMap} />
+            <Button text="ajouter" glyph="solid/plus" onClick={this.addMap} />
 
-            <Label glyph="cube" text="Charger" grow="1" kind="title" />
-            <Button text="démarrer" glyph="plus" onClick={this.run} />
+            <Label glyph="solid/cube" text="Charger" grow="1" kind="title" />
+            <Button text="démarrer" glyph="solid/plus" onClick={this.run} />
 
             <ShowTable kind="pane">
 
               <Label
-                glyph="cube"
+                glyph="solid/cube"
                 text="Prévisualisation"
                 grow="1"
                 kind="title"
