@@ -81,7 +81,12 @@ class Etl extends Form {
             <Field kind="file" accept=".csv" model=".file" />
             <Button text="démarrer" onClick={this.runPreview} />
 
-            <Label glyph="solid/cube" text="Transformer" grow="1" kind="title" />
+            <Label
+              glyph="solid/cube"
+              text="Transformer"
+              grow="1"
+              kind="title"
+            />
 
             <MappingTable frame="true" />
             <Field labelText="table" model=".table" />
