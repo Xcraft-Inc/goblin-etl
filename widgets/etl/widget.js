@@ -76,13 +76,13 @@ class Etl extends Form {
           </Container>
           <Container kind="panes">
 
-            <Label glyph="solid/cube" text="Extraire" grow="1" kind="title" />
+            <Label glyph="light/cube" text="Extraire" grow="1" kind="title" />
 
             <Field kind="file" accept=".csv" model=".file" />
             <Button text="démarrer" onClick={this.runPreview} />
 
             <Label
-              glyph="solid/cube"
+              glyph="light/cube"
               text="Transformer"
               grow="1"
               kind="title"
@@ -95,13 +95,13 @@ class Etl extends Form {
             <Field labelText="paramètre" model=".toParam" />
             <Button text="ajouter" glyph="solid/plus" onClick={this.addMap} />
 
-            <Label glyph="solid/cube" text="Charger" grow="1" kind="title" />
+            <Label glyph="light/cube" text="Charger" grow="1" kind="title" />
             <Button text="démarrer" glyph="solid/plus" onClick={this.run} />
 
             <ShowTable kind="pane">
 
               <Label
-                glyph="solid/cube"
+                glyph="light/cube"
                 text="Prévisualisation"
                 grow="1"
                 kind="title"
