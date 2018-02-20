@@ -1,10 +1,10 @@
 'use strict';
 
-const path = require ('path');
-const goblinName = path.basename (module.parent.filename, '.js');
-const Papa = require ('papaparse');
-const Goblin = require ('xcraft-core-goblin');
-const entityMeta = require ('goblin-rethink').entityMeta;
+const path = require('path');
+const goblinName = path.basename(module.parent.filename, '.js');
+const Papa = require('papaparse');
+const Goblin = require('xcraft-core-goblin');
+const entityMeta = require('goblin-rethink').entityMeta;
 
 // Define initial logic values
 const logicState = {
@@ -40,39 +40,36 @@ const logicState = {
 // Define logic handlers according rc.json
 const logicHandlers = {
   create: (state, action) => {
-    return state.set ('id', action.get ('id'));
+    return state.set('id', action.get('id'));
   },
   'add-preview-column': (state, action) => {
-    return state.set ('preview.header', action.get ('columns'));
+    return state.set('preview.header', action.get('columns'));
   },
   'add-preview-row': (state, action) => {
-    return state.set (
-      `preview.rows.${action.get ('rowId')}`,
-      action.get ('row')
-    );
+    return state.set(`preview.rows.${action.get('rowId')}`, action.get('row'));
   },
   'map-column-to-param': (state, action) => {
-    const type = action.get ('type');
-    const table = action.get ('table');
-    const fromColumn = action.get ('fromColumn');
+    const type = action.get('type');
+    const table = action.get('table');
+    const fromColumn = action.get('fromColumn');
     const column = type + 'Id';
     return state
-      .merge (`mapping.rows.${table}`, action.get ('row'))
-      .set (`mapping.header.${fromColumn}`, {
+      .merge(`mapping.rows.${table}`, action.get('row'))
+      .set(`mapping.header.${fromColumn}`, {
         id: fromColumn,
         name: fromColumn,
         description: fromColumn,
         grow: '1',
         textAlign: 'right',
       })
-      .set (`preview.header.${column}`, {
+      .set(`preview.header.${column}`, {
         id: column,
         name: column,
         description: column,
         grow: '1',
         textAlign: 'right',
       })
-      .set (`mapping.header.${column}`, {
+      .set(`mapping.header.${column}`, {
         id: column,
         name: column,
         description: column,
@@ -82,38 +79,35 @@ const logicHandlers = {
   },
 };
 
-Goblin.registerQuest (goblinName, 'create', function (quest, desktopId) {
-  quest.goblin.setX ('desktopId', desktopId);
-  quest.do ();
+Goblin.registerQuest(goblinName, 'create', function(quest, desktopId) {
+  quest.goblin.setX('desktopId', desktopId);
+  quest.do();
 });
 
-Goblin.registerQuest (goblinName, 'preview-csv', function (quest, filePath) {
+Goblin.registerQuest(goblinName, 'preview-csv', function(quest, filePath) {
   try {
-    const stream = require ('fs').createReadStream;
-    let file = stream (filePath);
-    Papa.parse (file, {
+    const stream = require('fs').createReadStream;
+    let file = stream(filePath);
+    Papa.parse(file, {
       header: true,
       preview: 1,
       step: row => {
-        quest.me.addPreviewColumn ({header: row.data[0]});
+        quest.me.addPreviewColumn({header: row.data[0]});
       },
     });
-    Papa.parse (file, {
+    Papa.parse(file, {
       header: true,
       preview: 10,
       step: row => {
-        quest.me.addPreviewRow ({data: row.data[0]});
+        quest.me.addPreviewRow({data: row.data[0]});
       },
     });
   } catch (err) {
-    throw new Error (err);
+    throw new Error(err);
   }
 });
 
-Goblin.registerQuest (goblinName, 'add-preview-column', function (
-  quest,
-  header
-) {
+Goblin.registerQuest(goblinName, 'add-preview-column', function(quest, header) {
   const columns = {};
 
   for (const column in header) {
@@ -126,19 +120,19 @@ Goblin.registerQuest (goblinName, 'add-preview-column', function (
     };
   }
 
-  quest.do ({columns});
+  quest.do({columns});
 });
 
-Goblin.registerQuest (goblinName, 'map-column-to-param', function (
+Goblin.registerQuest(goblinName, 'map-column-to-param', function(
   quest,
   table,
   fromColumn,
   toParam,
   type
 ) {
-  const state = quest.goblin.getState ();
-  const currentSize = state.get ('mapping.rows')._state.size;
-  let order = state.get (`mapping.rows.${table}.order`);
+  const state = quest.goblin.getState();
+  const currentSize = state.get('mapping.rows')._state.size;
+  let order = state.get(`mapping.rows.${table}.order`);
   if (order === undefined) {
     order = currentSize;
   }
@@ -152,52 +146,52 @@ Goblin.registerQuest (goblinName, 'map-column-to-param', function (
     [fromColumn]: toParam,
   };
 
-  quest.do ({table, row});
+  quest.do({table, row});
 });
 
-Goblin.registerQuest (goblinName, 'add-preview-row', function (quest, data) {
-  const rowId = quest.uuidV4 ();
-  const row = Object.assign (
+Goblin.registerQuest(goblinName, 'add-preview-row', function(quest, data) {
+  const rowId = quest.uuidV4();
+  const row = Object.assign(
     {
       id: rowId,
     },
     data
   );
-  quest.do ({rowId, row});
+  quest.do({rowId, row});
 });
 
-Goblin.registerQuest (goblinName, 'load-csv', function* (
+Goblin.registerQuest(goblinName, 'load-csv', function*(
   quest,
   filePath,
   mapping,
   next
 ) {
   try {
-    const stream = require ('fs').createReadStream;
-    let file = stream (filePath);
+    const stream = require('fs').createReadStream;
+    let file = stream(filePath);
     const ids = [];
     const tables = {};
     const orderMapping = [];
 
     for (const table in mapping) {
-      orderMapping.splice (mapping[table].order, 0, mapping[table]);
+      orderMapping.splice(mapping[table].order, 0, mapping[table]);
       tables[table] = [];
     }
-    orderMapping.sort ();
+    orderMapping.sort();
     let rowIndex = 0;
-    Papa.parse (file, {
+    Papa.parse(file, {
       header: true,
-      complete: next.parallel ().arg (0),
+      complete: next.parallel().arg(0),
       step: row => {
         const rowData = row.data[0];
         for (const tableMap of orderMapping) {
           const table = tableMap.table;
           const type = tableMap.type;
           const entity = {
-            id: `${type}@${quest.uuidV4 ()}`,
+            id: `${type}@${quest.uuidV4()}`,
           };
 
-          entityMeta.set (
+          entityMeta.set(
             entity,
             type,
             null,
@@ -232,67 +226,71 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
           }
 
           ids[rowIndex] = {[`${type}Id`]: entity.id};
-          tables[table].push (entity);
+          tables[table].push(entity);
         }
         rowIndex++;
       },
     });
 
-    yield next.sync ();
-    const i = quest.openInventory ();
-    const desktopId = quest.goblin.getX ('desktopId');
-    const deskAPI = quest.getGoblinAPI ('desktop', desktopId);
-    const r = i.getAPI (`rethink@${desktopId}`);
+    yield next.sync();
+    const i = quest.openInventory();
+    const desktopId = quest.goblin.getX('desktopId');
+    const deskAPI = quest.getGoblinAPI('desktop', desktopId);
+    const r = i.getAPI(`rethink@${desktopId}`);
     for (const table in tables) {
-      yield r.set ({table, documents: tables[table]});
-      deskAPI.addNotification ({
+      yield r.set({table, documents: tables[table]});
+      deskAPI.addNotification({
         color: 'red',
-        message: `${tables[table].length} entités ${table} inséréés dans le stockage, démarrage de la mise à jour des entités...`,
+        message: `${
+          tables[table].length
+        } entités ${table} inséréés dans le stockage, démarrage de la mise à jour des entités...`,
         glyph: 'solid/check',
       });
 
       let batchCount = 0;
       const batchSize = 200;
       for (const entity of tables[table]) {
-        quest.cmd (
+        quest.cmd(
           `${table}.create`,
           {
             id: entity.id,
             desktopId,
             entity: entity,
           },
-          next.parallel ()
+          next.parallel()
         );
 
         batchCount++;
         if (batchCount % batchSize === 0) {
-          const ids = yield next.sync ();
+          const ids = yield next.sync();
           for (const did of ids) {
-            quest.cmd (`${table}.delete`, {
+            quest.cmd(`${table}.delete`, {
               id: did,
             });
           }
 
-          deskAPI.addNotification ({
+          deskAPI.addNotification({
             notificationId: 'etl',
             color: 'red',
-            message: `${Number (batchCount / tables[table].length * 100).toFixed (0)}% mis à jour`,
+            message: `${Number(batchCount / tables[table].length * 100).toFixed(
+              0
+            )}% mis à jour`,
             glyph: 'solid/check',
           });
         }
       }
-      const ids = yield next.sync ();
-      deskAPI.addNotification ({
+      const ids = yield next.sync();
+      deskAPI.addNotification({
         color: 'red',
         message: `${ids.length} entités ${table} mises à jour`,
         glyph: 'solid/check',
       });
       for (const did of ids) {
-        quest.cmd (`${table}.delete`, {
+        quest.cmd(`${table}.delete`, {
           id: did,
         });
       }
-      deskAPI.addNotification ({
+      deskAPI.addNotification({
         color: 'green',
         message: `${tables[table].length} entités ${table} chargées`,
         glyph: 'solid/check',
@@ -300,11 +298,11 @@ Goblin.registerQuest (goblinName, 'load-csv', function* (
     }
     return;
   } catch (err) {
-    throw new Error (err);
+    throw new Error(err);
   }
 });
 
-Goblin.registerQuest (goblinName, 'delete', function (quest) {});
+Goblin.registerQuest(goblinName, 'delete', function(quest) {});
 
 // Create a Goblin with initial state and handlers
-module.exports = Goblin.configure (goblinName, logicState, logicHandlers);
+module.exports = Goblin.configure(goblinName, logicState, logicHandlers);

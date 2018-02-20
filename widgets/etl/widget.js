@@ -8,65 +8,65 @@ import Field from 'gadgets/field/widget';
 import Table from 'gadgets/table/widget';
 
 class Etl extends Form {
-  constructor () {
-    super (...arguments);
-    this.runPreview = this.runPreview.bind (this);
-    this.addMap = this.addMap.bind (this);
-    this.run = this.run.bind (this);
+  constructor() {
+    super(...arguments);
+    this.runPreview = this.runPreview.bind(this);
+    this.addMap = this.addMap.bind(this);
+    this.run = this.run.bind(this);
   }
 
-  static get wiring () {
+  static get wiring() {
     return {
       id: 'id',
     };
   }
 
-  addMap () {
-    this.do ('map-column-to-param', {
-      table: this.getFormValue ('.table'),
-      type: this.getFormValue ('.type'),
-      fromColumn: this.getFormValue ('.fromColumn'),
-      toParam: this.getFormValue ('.toParam'),
+  addMap() {
+    this.do('map-column-to-param', {
+      table: this.getFormValue('.table'),
+      type: this.getFormValue('.type'),
+      fromColumn: this.getFormValue('.fromColumn'),
+      toParam: this.getFormValue('.toParam'),
     });
   }
 
-  runPreview () {
-    this.do ('preview-csv', {
-      filePath: this.getFormValue ('.file'),
+  runPreview() {
+    this.do('preview-csv', {
+      filePath: this.getFormValue('.file'),
     });
   }
 
-  run () {
-    const mapping = this.getFormValue ('.mapping.rows').toJS ();
-    this.do ('load-csv', {
-      filePath: this.getFormValue ('.file'),
+  run() {
+    const mapping = this.getFormValue('.mapping.rows').toJS();
+    this.do('load-csv', {
+      filePath: this.getFormValue('.file'),
       mapping,
     });
   }
 
-  render () {
+  render() {
     const Form = this.Form;
-    const ShowTable = this.getWidgetToFormMapper (Container, header => {
+    const ShowTable = this.getWidgetToFormMapper(Container, header => {
       return {show: header.state.size > 0};
-    }) ('.preview.header');
+    })('.preview.header');
 
-    const PreviewTable = this.getWidgetToFormMapper (Table, data => {
-      const table = data.toJS ();
+    const PreviewTable = this.getWidgetToFormMapper(Table, data => {
+      const table = data.toJS();
       return {data: table};
-    }) ('.preview');
+    })('.preview');
 
-    const MappingTable = this.getWidgetToFormMapper (Table, data => {
-      const table = data.toJS ();
+    const MappingTable = this.getWidgetToFormMapper(Table, data => {
+      const table = data.toJS();
       return {data: table};
-    }) ('.mapping');
+    })('.mapping');
 
-    const Columns = this.WithState (Field, header => {
+    const Columns = this.WithState(Field, header => {
       if (!header) {
         return {list: [], model: '.fromColumn'};
       }
-      const list = header.map (h => h.get ('id')).toArray ();
+      const list = header.map(h => h.get('id')).toArray();
       return {list, model: '.fromColumn'};
-    }) ('.preview.header');
+    })('.preview.header');
 
     return (
       <Container kind="view" grow="1" spacing="large">
@@ -75,7 +75,6 @@ class Etl extends Form {
             <Label text="ETL" kind="pane-header" />
           </Container>
           <Container kind="panes">
-
             <Label glyph="light/cube" text="Extraire" grow="1" kind="title" />
 
             <Field kind="file" accept=".csv" model=".file" />
@@ -99,7 +98,6 @@ class Etl extends Form {
             <Button text="démarrer" glyph="solid/plus" onClick={this.run} />
 
             <ShowTable kind="pane">
-
               <Label
                 glyph="light/cube"
                 text="Prévisualisation"
@@ -109,7 +107,6 @@ class Etl extends Form {
               <PreviewTable frame="true" />
             </ShowTable>
           </Container>
-
         </Form>
       </Container>
     );
