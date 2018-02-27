@@ -234,7 +234,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
 
     yield next.sync();
     const desktopId = quest.goblin.getX('desktopId');
-    const deskAPI = quest.getGoblinAPI('desktop', desktopId);
+    const deskAPI = quest.getAPI(desktopId);
     const r = quest.getStorage('rethink');
     for (const table in tables) {
       yield r.set({table, documents: tables[table]});
