@@ -263,9 +263,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
         if (batchCount % batchSize === 0) {
           const ids = yield next.sync();
           for (const did of ids) {
-            quest.cmd(`${table}.delete`, {
-              id: did,
-            });
+            quest.release(did);
           }
 
           deskAPI.addNotification({
@@ -285,9 +283,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
         glyph: 'solid/check',
       });
       for (const did of ids) {
-        quest.cmd(`${table}.delete`, {
-          id: did,
-        });
+        quest.release(did);
       }
       deskAPI.addNotification({
         color: 'green',
