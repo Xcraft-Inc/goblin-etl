@@ -4,7 +4,7 @@ const path = require('path');
 const goblinName = path.basename(module.parent.filename, '.js');
 const Papa = require('papaparse');
 const Goblin = require('xcraft-core-goblin');
-const entityMeta = require('goblin-rethink').entityMeta;
+const entityMeta = require('goblin-workshop').entityMeta;
 
 // Define initial logic values
 const logicState = {
