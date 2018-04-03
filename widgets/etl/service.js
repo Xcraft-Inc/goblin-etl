@@ -199,7 +199,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
             null,
             entity.id,
             [],
-            'initial-import'
+            'published'
           );
 
           for (const map in tableMap) {
@@ -255,6 +255,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
             id: entity.id,
             desktopId,
             entity: entity,
+            initialImport: true,
           },
           next.parallel()
         );
