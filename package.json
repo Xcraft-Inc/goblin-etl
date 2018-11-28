@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "xcraft-core-goblin": "^2.0.0",
-    "papaparse": "4.3.6"
+    "papaparse": "^4.3.6"
   },
   "devDependencies": {
     "xcraft-dev-rules": "^0.3.0",
