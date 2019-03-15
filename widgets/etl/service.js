@@ -234,11 +234,11 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
 
     yield next.sync();
     const desktopId = quest.goblin.getX('desktopId');
-    const deskAPI = quest.getAPI(desktopId);
+    const deskAPI = quest.getAPI(desktopId).noThrow();
     const r = quest.getStorage('rethink');
     for (const table in tables) {
       yield r.set({table, documents: tables[table]});
-      deskAPI.addNotification({
+      yield deskAPI.addNotification({
         color: 'red',
         message: `${
           tables[table].length
@@ -267,7 +267,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
             quest.release(did);
           }
 
-          deskAPI.addNotification({
+          yield deskAPI.addNotification({
             notificationId: 'etl',
             color: 'red',
             message: `${Number(batchCount / tables[table].length * 100).toFixed(
@@ -278,7 +278,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
         }
       }
       const ids = yield next.sync();
-      deskAPI.addNotification({
+      yield deskAPI.addNotification({
         color: 'red',
         message: `${ids.length} entités ${table} mises à jour`,
         glyph: 'solid/check',
@@ -286,7 +286,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
       for (const did of ids) {
         quest.release(did);
       }
-      deskAPI.addNotification({
+      yield deskAPI.addNotification({
         color: 'green',
         message: `${tables[table].length} entités ${table} chargées`,
         glyph: 'solid/check',
