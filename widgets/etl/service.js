@@ -270,9 +270,9 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
           yield deskAPI.addNotification({
             notificationId: 'etl',
             color: 'red',
-            message: `${Number(batchCount / tables[table].length * 100).toFixed(
-              0
-            )}% mis à jour`,
+            message: `${Number(
+              (batchCount / tables[table].length) * 100
+            ).toFixed(0)}% mis à jour`,
             glyph: 'solid/check',
           });
         }
