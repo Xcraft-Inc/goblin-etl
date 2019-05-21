@@ -54,7 +54,7 @@ const logicHandlers = {
     const fromColumn = action.get('fromColumn');
     const column = type + 'Id';
     return state
-      .merge(`mapping.rows.${table}`, action.get('row'))
+      .mergeDeep(`mapping.rows.${table}`, action.get('row'))
       .set(`mapping.header.${fromColumn}`, {
         id: fromColumn,
         name: fromColumn,
