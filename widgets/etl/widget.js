@@ -69,7 +69,7 @@ class Etl extends Form {
     })('.preview.header');
 
     return (
-      <Container kind="view" grow="1" spacing="large">
+      <Container kind="view" grow="1" horizontalSpacing="large">
         <Form {...this.formConfig}>
           <Container kind="pane-header">
             <Label text="ETL" kind="pane-header" />
