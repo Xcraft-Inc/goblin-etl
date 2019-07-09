@@ -6,6 +6,7 @@ import Label from 'gadgets/label/widget';
 import Button from 'gadgets/button/widget';
 import Field from 'gadgets/field/widget';
 import Table from 'gadgets/table/widget';
+import FileInput from 'goblin-gadgets/widgets/file-input/widget';
 
 class Etl extends Form {
   constructor() {
@@ -77,7 +78,7 @@ class Etl extends Form {
           <Container kind="panes">
             <Label glyph="light/cube" text="Extraire" grow="1" kind="title" />
 
-            <Field kind="file" accept=".csv" model=".file" />
+            <FileInput accept=".csv" model=".file" />
             <Button text="démarrer" onClick={this.runPreview} />
 
             <Label
