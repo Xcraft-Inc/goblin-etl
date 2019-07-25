@@ -39,7 +39,7 @@ const logicState = {
 
 // Define logic handlers according rc.json
 const logicHandlers = {
-  create: (state, action) => {
+  'create': (state, action) => {
     return state.set('id', action.get('id'));
   },
   'add-preview-column': (state, action) => {
@@ -197,6 +197,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
             null,
             null,
             null,
+            null,
             entity.id,
             [],
             'published'
@@ -240,9 +241,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
       yield r.set({table, documents: tables[table]});
       yield deskAPI.addNotification({
         color: 'red',
-        message: `${
-          tables[table].length
-        } entités ${table} inséréés dans le stockage, démarrage de la mise à jour des entités...`,
+        message: `${tables[table].length} entités ${table} inséréés dans le stockage, démarrage de la mise à jour des entités...`,
         glyph: 'solid/check',
       });
 
