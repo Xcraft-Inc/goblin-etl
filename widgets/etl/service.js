@@ -237,6 +237,11 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
     const desktopId = quest.goblin.getX('desktopId');
     const deskAPI = quest.getAPI(desktopId).noThrow();
     const r = quest.getStorage('rethink');
+    let startTime = Date.now() / 100;
+    yield deskAPI.monitorPushSample({
+      channel: 'activity',
+      sample: 1,
+    });
     for (const table in tables) {
       yield r.set({table, documents: tables[table]});
       yield deskAPI.addNotification({
@@ -246,7 +251,8 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
       });
 
       let batchCount = 0;
-      const batchSize = 200;
+      //- const batchSize = 200;
+      const batchSize = 100;
       for (const entity of tables[table]) {
         quest.cmd(
           `${table}.create`,
@@ -265,14 +271,21 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
           for (const did of ids) {
             quest.release(did);
           }
-
-          yield deskAPI.addNotification({
-            notificationId: 'etl',
-            color: 'red',
-            message: `${Number(
-              (batchCount / tables[table].length) * 100
-            ).toFixed(0)}% mis à jour`,
-            glyph: 'solid/check',
+          const progress = Number((batchCount / tables[table].length) * 100);
+          //- yield deskAPI.addNotification({
+          //-   notificationId: 'etl',
+          //-   color: 'red',
+          //-   message: `${progress.toFixed(0)}% mis à jour`,
+          //-   glyph: 'solid/check',
+          //- });
+          const currentTime = Date.now() / 100;
+          const duration = currentTime - startTime;
+          startTime = currentTime;
+          yield deskAPI.monitorPushSample({
+            channel: 'activity',
+            sample: duration,
+            current: progress,
+            total: 100,
           });
         }
       }
@@ -291,6 +304,10 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
         glyph: 'solid/check',
       });
     }
+    yield deskAPI.monitorPushSample({
+      channel: 'activity',
+      sample: 0,
+    });
     return;
   } catch (err) {
     throw new Error(err);
