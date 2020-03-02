@@ -238,10 +238,10 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
     const deskAPI = quest.getAPI(desktopId).noThrow();
     const r = quest.getStorage('rethink');
     let startTime = Date.now() / 100;
-    yield deskAPI.monitorPushSample({
-      channel: 'activity',
-      sample: 1,
-    });
+    //- yield deskAPI.monitorPushSample({
+    //-   channel: 'activity',
+    //-   sample: 1,
+    //- });
     for (const table in tables) {
       yield r.set({table, documents: tables[table]});
       yield deskAPI.addNotification({
@@ -281,12 +281,12 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
           const currentTime = Date.now() / 100;
           const duration = currentTime - startTime;
           startTime = currentTime;
-          yield deskAPI.monitorPushSample({
-            channel: 'activity',
-            sample: duration,
-            current: progress,
-            total: 100,
-          });
+          //- yield deskAPI.monitorPushSample({
+          //-   channel: 'activity',
+          //-   sample: duration,
+          //-   current: progress,
+          //-   total: 100,
+          //- });
         }
       }
       const ids = yield next.sync();
@@ -304,10 +304,10 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
         glyph: 'solid/check',
       });
     }
-    yield deskAPI.monitorPushSample({
-      channel: 'activity',
-      sample: 0,
-    });
+    //- yield deskAPI.monitorPushSample({
+    //-   channel: 'activity',
+    //-   sample: 0,
+    //- });
     return;
   } catch (err) {
     throw new Error(err);
