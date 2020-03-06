@@ -269,8 +269,10 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
           yield deskAPI.addNotification({
             notificationId: 'etl',
             color: 'red',
-            message: `${progress.toFixed(0)}% mis à jour`,
             glyph: 'solid/check',
+            //- message: `${progress.toFixed(0)}% mis à jour`,
+            current: progress,
+            total: 100,
           });
         }
       }
