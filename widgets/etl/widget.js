@@ -88,7 +88,7 @@ class Etl extends Form {
               kind="title"
             />
 
-            <MappingTable frame="true" />
+            <MappingTable frame={true} />
             <Field labelText="table" model=".table" />
             <Field labelText="type" model=".type" />
             <Columns kind="radio" labelText="colonne" direction="wrap" />
@@ -105,7 +105,7 @@ class Etl extends Form {
                 grow="1"
                 kind="title"
               />
-              <PreviewTable frame="true" />
+              <PreviewTable frame={true} />
             </ShowTable>
           </Container>
         </Form>
