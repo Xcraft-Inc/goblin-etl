@@ -47,25 +47,25 @@ class Etl extends Form {
 
   render() {
     const Form = this.Form;
-    const ShowTable = this.getWidgetToFormMapper(Container, header => {
+    const ShowTable = this.getWidgetToFormMapper(Container, (header) => {
       return {show: header.state.size > 0};
     })('.preview.header');
 
-    const PreviewTable = this.getWidgetToFormMapper(Table, data => {
+    const PreviewTable = this.getWidgetToFormMapper(Table, (data) => {
       const table = data.toJS();
       return {data: table};
     })('.preview');
 
-    const MappingTable = this.getWidgetToFormMapper(Table, data => {
+    const MappingTable = this.getWidgetToFormMapper(Table, (data) => {
       const table = data.toJS();
       return {data: table};
     })('.mapping');
 
-    const Columns = this.WithState(Field, header => {
+    const Columns = this.WithState(Field, (header) => {
       if (!header) {
         return {list: [], model: '.fromColumn'};
       }
-      const list = header.map(h => h.get('id')).toArray();
+      const list = header.map((h) => h.get('id')).toArray();
       return {list, model: '.fromColumn'};
     })('.preview.header');
 

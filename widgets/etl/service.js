@@ -79,26 +79,26 @@ const logicHandlers = {
   },
 };
 
-Goblin.registerQuest(goblinName, 'create', function(quest, desktopId) {
+Goblin.registerQuest(goblinName, 'create', function (quest, desktopId) {
   quest.goblin.setX('desktopId', desktopId);
   quest.do();
 });
 
-Goblin.registerQuest(goblinName, 'preview-csv', function(quest, filePath) {
+Goblin.registerQuest(goblinName, 'preview-csv', function (quest, filePath) {
   try {
     const stream = require('fs').createReadStream;
     let file = stream(filePath);
     Papa.parse(file, {
       header: true,
       preview: 1,
-      step: row => {
+      step: (row) => {
         quest.me.addPreviewColumn({header: row.data[0]});
       },
     });
     Papa.parse(file, {
       header: true,
       preview: 10,
-      step: row => {
+      step: (row) => {
         quest.me.addPreviewRow({data: row.data[0]});
       },
     });
@@ -107,7 +107,10 @@ Goblin.registerQuest(goblinName, 'preview-csv', function(quest, filePath) {
   }
 });
 
-Goblin.registerQuest(goblinName, 'add-preview-column', function(quest, header) {
+Goblin.registerQuest(goblinName, 'add-preview-column', function (
+  quest,
+  header
+) {
   const columns = {};
 
   for (const column in header) {
@@ -123,7 +126,7 @@ Goblin.registerQuest(goblinName, 'add-preview-column', function(quest, header) {
   quest.do({columns});
 });
 
-Goblin.registerQuest(goblinName, 'map-column-to-param', function(
+Goblin.registerQuest(goblinName, 'map-column-to-param', function (
   quest,
   table,
   fromColumn,
@@ -149,7 +152,7 @@ Goblin.registerQuest(goblinName, 'map-column-to-param', function(
   quest.do({table, row});
 });
 
-Goblin.registerQuest(goblinName, 'add-preview-row', function(quest, data) {
+Goblin.registerQuest(goblinName, 'add-preview-row', function (quest, data) {
   const rowId = quest.uuidV4();
   const row = Object.assign(
     {
@@ -160,7 +163,7 @@ Goblin.registerQuest(goblinName, 'add-preview-row', function(quest, data) {
   quest.do({rowId, row});
 });
 
-Goblin.registerQuest(goblinName, 'load-csv', function*(
+Goblin.registerQuest(goblinName, 'load-csv', function* (
   quest,
   filePath,
   mapping,
@@ -182,7 +185,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
     Papa.parse(file, {
       header: true,
       complete: next.parallel().arg(0),
-      step: row => {
+      step: (row) => {
         const rowData = row.data[0];
         for (const tableMap of orderMapping) {
           const table = tableMap.table;
@@ -297,7 +300,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function*(
   }
 });
 
-Goblin.registerQuest(goblinName, 'delete', function(quest) {});
+Goblin.registerQuest(goblinName, 'delete', function (quest) {});
 
 // Create a Goblin with initial state and handlers
 module.exports = Goblin.configure(goblinName, logicState, logicHandlers);
