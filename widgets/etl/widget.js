@@ -65,7 +65,10 @@ class Etl extends Form {
       if (!header) {
         return {list: [], model: '.fromColumn'};
       }
-      const list = header.map((h) => h.get('id')).toArray();
+      const list = header
+        .map((h) => h.get('id'))
+        .valueSeq()
+        .toArray();
       return {list, model: '.fromColumn'};
     })('.preview.header');
 
