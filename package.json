@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "papaparse": "^5.0.1",
-    "xcraft-core-goblin": "^4.0.1"
+    "xcraft-core-goblin": "^5.0.0"
   },
   "devDependencies": {
     "prettier": "2.0.4",
