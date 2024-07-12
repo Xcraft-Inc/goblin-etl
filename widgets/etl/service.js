@@ -250,21 +250,21 @@ Goblin.registerQuest(goblinName, 'load-csv', function* (
 
       let batchCount = 0;
       const batchSize = 200;
+      let promises = [];
       for (const entity of tables[table]) {
-        quest.cmd(
-          `${table}.create`,
-          {
+        promises.push(
+          quest.cmd(`${table}.create`, {
             id: entity.id,
             desktopId,
             entity: entity,
             initialImport: true,
-          },
-          next.parallel()
+          })
         );
 
         batchCount++;
         if (batchCount % batchSize === 0) {
-          const ids = yield next.sync();
+          const ids = yield Promise.all(promises);
+          promises = [];
           for (const did of ids) {
             quest.release(did);
           }
@@ -279,7 +279,7 @@ Goblin.registerQuest(goblinName, 'load-csv', function* (
           });
         }
       }
-      const ids = yield next.sync();
+      const ids = yield Promise.all(promises);
       yield deskAPI.addNotification({
         color: 'red',
         message: `${ids.length} entités ${table} mises à jour`,
